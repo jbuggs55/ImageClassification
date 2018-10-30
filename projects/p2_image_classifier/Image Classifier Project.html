@@ -13191,8 +13191,8 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># TODO: Define your transforms for the training, validation, and testing sets</span>
-<span class="n">train_transforms</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
-                                       <span class="n">transforms</span><span class="o">.</span><span class="n">RandomRotation</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+<span class="n">train_transforms</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">RandomRotation</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+                                       <span class="n">transforms</span><span class="o">.</span><span class="n">RandomResizedCrop</span><span class="p">(</span><span class="mi">224</span><span class="p">),</span>
                                        <span class="n">transforms</span><span class="o">.</span><span class="n">RandomHorizontalFlip</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span>
                                        <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
                                        <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">([</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
@@ -13340,7 +13340,7 @@ div#notebook {
 
 <div class="output_subarea output_stream output_stderr output_text">
 <pre>Downloading: &#34;https://download.pytorch.org/models/vgg19-dcbb9e9d.pth&#34; to /root/.torch/models/vgg19-dcbb9e9d.pth
-100%|██████████| 574673361/574673361 [01:19&lt;00:00, 7249284.84it/s]
+100%|██████████| 574673361/574673361 [00:14&lt;00:00, 39615856.66it/s]
 </pre>
 </div>
 </div>
@@ -13351,7 +13351,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#function to calculate accuracy and loss on validation data</span>
@@ -13387,20 +13387,43 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Create Neural Net Classifier</span>
-<span class="k">def</span> <span class="nf">build_classifier</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_sizes</span><span class="p">,</span> <span class="n">output_size</span><span class="p">,</span> <span class="n">drop_out</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">build_model</span><span class="p">(</span><span class="n">structure</span> <span class="o">=</span> <span class="s1">&#39;vgg19&#39;</span><span class="p">,</span> <span class="n">hidden_layers</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4096</span><span class="p">,</span><span class="mi">2048</span><span class="p">,</span> <span class="mi">512</span><span class="p">],</span> <span class="n">output_size</span> <span class="o">=</span> <span class="mi">102</span><span class="p">,</span> <span class="n">dropout</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">,</span> <span class="n">lr</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s1">&#39;gpu&#39;</span><span class="p">):</span>
+
+    <span class="n">arch</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;vgg19&quot;</span><span class="p">:</span><span class="mi">25088</span><span class="p">,</span><span class="s2">&quot;densenet121&quot;</span><span class="p">:</span><span class="mi">1024</span><span class="p">,</span><span class="s2">&quot;alexnet&quot;</span><span class="p">:</span><span class="mi">9216</span><span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">structure</span> <span class="o">==</span> <span class="s1">&#39;vgg19&#39;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">vgg19</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">structure</span> <span class="o">==</span> <span class="s1">&#39;densenet121&#39;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">densenet121</span><span class="p">(</span><span class="n">pretrained</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">structure</span> <span class="o">==</span> <span class="s1">&#39;alexnet&#39;</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">alexnet</span><span class="p">(</span><span class="n">pretrained</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> is not a valid model.Did you mean vgg19,densenet121,or alexnet?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">structure</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+        <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+
         <span class="n">classifier</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_size</span><span class="p">,</span> <span class="n">hidden_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">drop_out</span><span class="p">),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hidden_sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">drop_out</span><span class="p">),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_sizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">hidden_sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span> <span class="o">=</span> <span class="n">drop_out</span><span class="p">),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_sizes</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">output_size</span><span class="p">),</span>
-                    <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">classifier</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">arch</span><span class="p">[</span><span class="n">structure</span><span class="p">],</span> <span class="n">hidden_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hidden_layers</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_layers</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">hidden_layers</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="n">dropout</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_layers</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">output_size</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">model</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">classifier</span>
+        <span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
+        <span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="ow">and</span> <span class="n">engine</span> <span class="o">==</span> <span class="s1">&#39;cuda&#39;</span><span class="p">:</span>
+          <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span>
 </pre></div>
 
     </div>
@@ -13413,8 +13436,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">classifier</span> <span class="o">=</span> <span class="n">build_classifier</span><span class="p">(</span><span class="mi">25088</span><span class="p">,</span> <span class="p">[</span><span class="mi">4096</span><span class="p">,</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">512</span><span class="p">],</span> <span class="mi">102</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">)</span>    
-<span class="n">model</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">classifier</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">model</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span> <span class="o">=</span> <span class="n">build_model</span><span class="p">()</span>
 </pre></div>
 
     </div>
@@ -13425,22 +13447,6 @@ div#notebook {
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[10]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#hyperparameters</span>
-<span class="c1">#establish loss criteria used to train classifier only</span>
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">NLLLoss</span><span class="p">()</span>
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">classifier</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span> <span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
-</pre></div>
-
-    </div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#train</span>
@@ -13494,7 +13500,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
+<div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">train_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">train_dataloader</span><span class="p">,</span><span class="n">val_dataloader</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">criterion</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">)</span>
@@ -13514,57 +13520,57 @@ div#notebook {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Epoch: 1/5...  Time Elapsed: 41.964..  Train Loss: 4.5224 Val Loss 4.3315 Val Accuracy 0.074
-Epoch: 1/5...  Time Elapsed: 105.910..  Train Loss: 4.3208 Val Loss 4.0152 Val Accuracy 0.101
-Epoch: 1/5...  Time Elapsed: 170.436..  Train Loss: 3.9822 Val Loss 3.7186 Val Accuracy 0.180
-Epoch: 1/5...  Time Elapsed: 235.329..  Train Loss: 3.8384 Val Loss 3.3507 Val Accuracy 0.204
-Epoch: 1/5...  Time Elapsed: 300.132..  Train Loss: 3.5570 Val Loss 3.0758 Val Accuracy 0.253
-Epoch: 1/5...  Time Elapsed: 365.192..  Train Loss: 3.4339 Val Loss 2.7091 Val Accuracy 0.304
-Epoch: 1/5...  Time Elapsed: 430.006..  Train Loss: 3.1436 Val Loss 2.6474 Val Accuracy 0.334
-Epoch: 1/5...  Time Elapsed: 494.238..  Train Loss: 3.0967 Val Loss 2.4095 Val Accuracy 0.361
-Epoch: 1/5...  Time Elapsed: 558.552..  Train Loss: 2.8384 Val Loss 2.2123 Val Accuracy 0.413
-Epoch: 1/5...  Time Elapsed: 623.065..  Train Loss: 2.8097 Val Loss 2.1065 Val Accuracy 0.412
-Epoch: 2/5...  Time Elapsed: 685.185..  Train Loss: 1.7790 Val Loss 1.9455 Val Accuracy 0.453
-Epoch: 2/5...  Time Elapsed: 749.787..  Train Loss: 2.4526 Val Loss 1.8771 Val Accuracy 0.485
-Epoch: 2/5...  Time Elapsed: 814.168..  Train Loss: 2.5398 Val Loss 1.7665 Val Accuracy 0.510
-Epoch: 2/5...  Time Elapsed: 878.738..  Train Loss: 2.4876 Val Loss 1.6896 Val Accuracy 0.517
-Epoch: 2/5...  Time Elapsed: 943.129..  Train Loss: 2.2453 Val Loss 1.5969 Val Accuracy 0.551
-Epoch: 2/5...  Time Elapsed: 1007.638..  Train Loss: 2.2738 Val Loss 1.5308 Val Accuracy 0.559
-Epoch: 2/5...  Time Elapsed: 1071.828..  Train Loss: 2.2555 Val Loss 1.5634 Val Accuracy 0.554
-Epoch: 2/5...  Time Elapsed: 1136.747..  Train Loss: 2.2215 Val Loss 1.4659 Val Accuracy 0.569
-Epoch: 2/5...  Time Elapsed: 1201.019..  Train Loss: 2.0072 Val Loss 1.4522 Val Accuracy 0.591
-Epoch: 2/5...  Time Elapsed: 1264.803..  Train Loss: 2.1746 Val Loss 1.4218 Val Accuracy 0.601
-Epoch: 3/5...  Time Elapsed: 1327.219..  Train Loss: 0.7789 Val Loss 1.3667 Val Accuracy 0.599
-Epoch: 3/5...  Time Elapsed: 1391.633..  Train Loss: 1.9250 Val Loss 1.3907 Val Accuracy 0.612
-Epoch: 3/5...  Time Elapsed: 1456.437..  Train Loss: 1.9166 Val Loss 1.3626 Val Accuracy 0.606
-Epoch: 3/5...  Time Elapsed: 1520.658..  Train Loss: 1.8376 Val Loss 1.2901 Val Accuracy 0.639
-Epoch: 3/5...  Time Elapsed: 1584.016..  Train Loss: 1.8090 Val Loss 1.1980 Val Accuracy 0.646
-Epoch: 3/5...  Time Elapsed: 1648.116..  Train Loss: 1.7410 Val Loss 1.3131 Val Accuracy 0.632
-Epoch: 3/5...  Time Elapsed: 1712.538..  Train Loss: 1.8981 Val Loss 1.3667 Val Accuracy 0.602
-Epoch: 3/5...  Time Elapsed: 1777.187..  Train Loss: 1.8435 Val Loss 1.2356 Val Accuracy 0.652
-Epoch: 3/5...  Time Elapsed: 1841.892..  Train Loss: 1.8716 Val Loss 1.2461 Val Accuracy 0.656
-Epoch: 3/5...  Time Elapsed: 1906.634..  Train Loss: 1.9507 Val Loss 1.1811 Val Accuracy 0.667
-Epoch: 4/5...  Time Elapsed: 1969.019..  Train Loss: 0.1493 Val Loss 1.1552 Val Accuracy 0.657
-Epoch: 4/5...  Time Elapsed: 2033.317..  Train Loss: 1.7710 Val Loss 1.1597 Val Accuracy 0.661
-Epoch: 4/5...  Time Elapsed: 2096.886..  Train Loss: 1.8175 Val Loss 1.0777 Val Accuracy 0.678
-Epoch: 4/5...  Time Elapsed: 2160.941..  Train Loss: 1.7334 Val Loss 1.0527 Val Accuracy 0.685
-Epoch: 4/5...  Time Elapsed: 2225.324..  Train Loss: 1.7176 Val Loss 1.2097 Val Accuracy 0.654
-Epoch: 4/5...  Time Elapsed: 2289.694..  Train Loss: 1.7104 Val Loss 1.1144 Val Accuracy 0.664
-Epoch: 4/5...  Time Elapsed: 2354.120..  Train Loss: 1.7213 Val Loss 1.0544 Val Accuracy 0.693
-Epoch: 4/5...  Time Elapsed: 2418.656..  Train Loss: 1.7803 Val Loss 1.1304 Val Accuracy 0.693
-Epoch: 4/5...  Time Elapsed: 2482.866..  Train Loss: 1.6746 Val Loss 1.0179 Val Accuracy 0.718
-Epoch: 4/5...  Time Elapsed: 2547.053..  Train Loss: 1.6969 Val Loss 1.0233 Val Accuracy 0.719
-Epoch: 4/5...  Time Elapsed: 2611.103..  Train Loss: 1.6735 Val Loss 1.0359 Val Accuracy 0.710
-Epoch: 5/5...  Time Elapsed: 2672.631..  Train Loss: 1.3638 Val Loss 1.0018 Val Accuracy 0.729
-Epoch: 5/5...  Time Elapsed: 2736.462..  Train Loss: 1.6481 Val Loss 0.9864 Val Accuracy 0.714
-Epoch: 5/5...  Time Elapsed: 2800.519..  Train Loss: 1.5553 Val Loss 0.9445 Val Accuracy 0.747
-Epoch: 5/5...  Time Elapsed: 2865.365..  Train Loss: 1.5664 Val Loss 0.8914 Val Accuracy 0.745
-Epoch: 5/5...  Time Elapsed: 2930.112..  Train Loss: 1.5530 Val Loss 0.9308 Val Accuracy 0.722
-Epoch: 5/5...  Time Elapsed: 2994.886..  Train Loss: 1.5171 Val Loss 0.9899 Val Accuracy 0.709
-Epoch: 5/5...  Time Elapsed: 3059.762..  Train Loss: 1.6247 Val Loss 0.9748 Val Accuracy 0.729
-Epoch: 5/5...  Time Elapsed: 3124.342..  Train Loss: 1.5731 Val Loss 0.9455 Val Accuracy 0.724
-Epoch: 5/5...  Time Elapsed: 3188.615..  Train Loss: 1.5467 Val Loss 0.9069 Val Accuracy 0.747
-Epoch: 5/5...  Time Elapsed: 3253.122..  Train Loss: 1.4590 Val Loss 0.9292 Val Accuracy 0.726
+<pre>Epoch: 1/5...  Time Elapsed: 45.632..  Train Loss: 4.8061 Val Loss 4.5035 Val Accuracy 0.029
+Epoch: 1/5...  Time Elapsed: 116.196..  Train Loss: 4.4631 Val Loss 4.2580 Val Accuracy 0.108
+Epoch: 1/5...  Time Elapsed: 186.450..  Train Loss: 4.1935 Val Loss 3.9090 Val Accuracy 0.116
+Epoch: 1/5...  Time Elapsed: 256.864..  Train Loss: 3.9595 Val Loss 3.4961 Val Accuracy 0.216
+Epoch: 1/5...  Time Elapsed: 327.203..  Train Loss: 3.6270 Val Loss 3.1420 Val Accuracy 0.246
+Epoch: 1/5...  Time Elapsed: 397.738..  Train Loss: 3.4294 Val Loss 2.8542 Val Accuracy 0.311
+Epoch: 1/5...  Time Elapsed: 468.188..  Train Loss: 3.1152 Val Loss 2.5692 Val Accuracy 0.363
+Epoch: 1/5...  Time Elapsed: 538.637..  Train Loss: 2.9502 Val Loss 2.3797 Val Accuracy 0.370
+Epoch: 1/5...  Time Elapsed: 608.994..  Train Loss: 2.7163 Val Loss 2.2457 Val Accuracy 0.418
+Epoch: 1/5...  Time Elapsed: 679.559..  Train Loss: 2.6924 Val Loss 1.8728 Val Accuracy 0.481
+Epoch: 2/5...  Time Elapsed: 747.489..  Train Loss: 1.7435 Val Loss 1.8125 Val Accuracy 0.494
+Epoch: 2/5...  Time Elapsed: 817.889..  Train Loss: 2.3162 Val Loss 1.7498 Val Accuracy 0.503
+Epoch: 2/5...  Time Elapsed: 888.340..  Train Loss: 2.1796 Val Loss 1.5749 Val Accuracy 0.565
+Epoch: 2/5...  Time Elapsed: 958.482..  Train Loss: 2.1656 Val Loss 1.5123 Val Accuracy 0.556
+Epoch: 2/5...  Time Elapsed: 1028.708..  Train Loss: 1.9952 Val Loss 1.4442 Val Accuracy 0.583
+Epoch: 2/5...  Time Elapsed: 1099.113..  Train Loss: 1.9634 Val Loss 1.4954 Val Accuracy 0.589
+Epoch: 2/5...  Time Elapsed: 1169.528..  Train Loss: 2.1891 Val Loss 1.3886 Val Accuracy 0.593
+Epoch: 2/5...  Time Elapsed: 1239.865..  Train Loss: 1.9813 Val Loss 1.4076 Val Accuracy 0.601
+Epoch: 2/5...  Time Elapsed: 1310.392..  Train Loss: 1.8537 Val Loss 1.3253 Val Accuracy 0.605
+Epoch: 2/5...  Time Elapsed: 1380.865..  Train Loss: 1.7488 Val Loss 1.2546 Val Accuracy 0.647
+Epoch: 3/5...  Time Elapsed: 1448.781..  Train Loss: 0.6818 Val Loss 1.1912 Val Accuracy 0.660
+Epoch: 3/5...  Time Elapsed: 1519.312..  Train Loss: 1.6632 Val Loss 1.1436 Val Accuracy 0.678
+Epoch: 3/5...  Time Elapsed: 1589.816..  Train Loss: 1.6785 Val Loss 1.1282 Val Accuracy 0.683
+Epoch: 3/5...  Time Elapsed: 1660.536..  Train Loss: 1.6539 Val Loss 1.0474 Val Accuracy 0.706
+Epoch: 3/5...  Time Elapsed: 1731.090..  Train Loss: 1.6172 Val Loss 1.0221 Val Accuracy 0.708
+Epoch: 3/5...  Time Elapsed: 1801.789..  Train Loss: 1.5727 Val Loss 1.0717 Val Accuracy 0.678
+Epoch: 3/5...  Time Elapsed: 1872.120..  Train Loss: 1.5479 Val Loss 1.0846 Val Accuracy 0.704
+Epoch: 3/5...  Time Elapsed: 1942.589..  Train Loss: 1.5359 Val Loss 1.0050 Val Accuracy 0.735
+Epoch: 3/5...  Time Elapsed: 2013.149..  Train Loss: 1.4860 Val Loss 1.0088 Val Accuracy 0.728
+Epoch: 3/5...  Time Elapsed: 2083.659..  Train Loss: 1.5324 Val Loss 0.8891 Val Accuracy 0.752
+Epoch: 4/5...  Time Elapsed: 2151.422..  Train Loss: 0.1442 Val Loss 0.9329 Val Accuracy 0.740
+Epoch: 4/5...  Time Elapsed: 2221.906..  Train Loss: 1.3825 Val Loss 0.9796 Val Accuracy 0.737
+Epoch: 4/5...  Time Elapsed: 2292.334..  Train Loss: 1.4171 Val Loss 0.9498 Val Accuracy 0.753
+Epoch: 4/5...  Time Elapsed: 2362.987..  Train Loss: 1.3351 Val Loss 0.9390 Val Accuracy 0.734
+Epoch: 4/5...  Time Elapsed: 2433.519..  Train Loss: 1.3266 Val Loss 0.8489 Val Accuracy 0.738
+Epoch: 4/5...  Time Elapsed: 2503.760..  Train Loss: 1.3579 Val Loss 0.9069 Val Accuracy 0.742
+Epoch: 4/5...  Time Elapsed: 2574.341..  Train Loss: 1.4283 Val Loss 0.8457 Val Accuracy 0.755
+Epoch: 4/5...  Time Elapsed: 2644.872..  Train Loss: 1.3083 Val Loss 0.7818 Val Accuracy 0.787
+Epoch: 4/5...  Time Elapsed: 2715.421..  Train Loss: 1.3899 Val Loss 0.8085 Val Accuracy 0.779
+Epoch: 4/5...  Time Elapsed: 2785.897..  Train Loss: 1.3901 Val Loss 0.7975 Val Accuracy 0.780
+Epoch: 4/5...  Time Elapsed: 2856.454..  Train Loss: 1.3183 Val Loss 0.8402 Val Accuracy 0.763
+Epoch: 5/5...  Time Elapsed: 2924.401..  Train Loss: 1.0626 Val Loss 0.8476 Val Accuracy 0.765
+Epoch: 5/5...  Time Elapsed: 2994.943..  Train Loss: 1.2673 Val Loss 0.8011 Val Accuracy 0.772
+Epoch: 5/5...  Time Elapsed: 3065.271..  Train Loss: 1.2017 Val Loss 0.7982 Val Accuracy 0.786
+Epoch: 5/5...  Time Elapsed: 3135.466..  Train Loss: 1.2682 Val Loss 0.8412 Val Accuracy 0.773
+Epoch: 5/5...  Time Elapsed: 3206.089..  Train Loss: 1.2177 Val Loss 0.7491 Val Accuracy 0.792
+Epoch: 5/5...  Time Elapsed: 3276.475..  Train Loss: 1.3050 Val Loss 0.7987 Val Accuracy 0.761
+Epoch: 5/5...  Time Elapsed: 3346.834..  Train Loss: 1.2318 Val Loss 0.7481 Val Accuracy 0.792
+Epoch: 5/5...  Time Elapsed: 3417.188..  Train Loss: 1.1719 Val Loss 0.7505 Val Accuracy 0.785
+Epoch: 5/5...  Time Elapsed: 3487.607..  Train Loss: 1.2051 Val Loss 0.7109 Val Accuracy 0.792
+Epoch: 5/5...  Time Elapsed: 3558.032..  Train Loss: 1.2074 Val Loss 0.7386 Val Accuracy 0.804
 </pre>
 </div>
 </div>
@@ -13583,7 +13589,7 @@ Epoch: 5/5...  Time Elapsed: 3253.122..  Train Loss: 1.4590 Val Loss 0.9292 Val 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
+<div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># TODO: Do validation on the test set</span>
@@ -13610,7 +13616,7 @@ Epoch: 5/5...  Time Elapsed: 3253.122..  Train Loss: 1.4590 Val Loss 0.9292 Val 
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
+<div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">test_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">test_dataloader</span><span class="p">)</span>
@@ -13630,7 +13636,7 @@ Epoch: 5/5...  Time Elapsed: 3253.122..  Train Loss: 1.4590 Val Loss 0.9292 Val 
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Accuracy 68.38
+<pre>Accuracy 76.56
 </pre>
 </div>
 </div>
@@ -13648,6 +13654,44 @@ Epoch: 5/5...  Time Elapsed: 3253.122..  Train Loss: 1.4590 Val Loss 0.9292 Val 
 
 </div>
 </div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[22]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">save_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">epochs</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">train_img_ds</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Arguments: All arguements are inputs to building a model. These must be stored so we can rebhild the model when reloading at a later time.</span>
+<span class="sd">    Returns: This function does not return anything. It simply saves the model at the desired directory.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">class_to_idx</span> <span class="o">=</span> <span class="n">train_img_ds</span><span class="o">.</span><span class="n">class_to_idx</span>
+    <span class="n">checkpoint</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;state_dict&#39;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+                  <span class="s1">&#39;image_datasets&#39;</span> <span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">class_to_idx</span><span class="p">,</span>
+                  <span class="s1">&#39;epochs&#39;</span><span class="p">:</span> <span class="n">epochs</span><span class="p">,</span>
+                  <span class="s1">&#39;optimizer&#39;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+                  <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">model</span> <span class="p">}</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="s1">&#39;checkpoint.pth&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">save_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">optimizer</span><span class="p">,</span> <span class="n">train_img_ds</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -13687,20 +13731,7 @@ Epoch: 5/5...  Time Elapsed: 3253.122..  Train Loss: 1.4590 Val Loss 0.9292 Val 
 <div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">checkpoint</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;input_size&#39;</span><span class="p">:</span><span class="mi">25088</span><span class="p">,</span>
-    <span class="s1">&#39;hidden_layers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">4096</span><span class="p">,</span> <span class="mi">2048</span><span class="p">,</span> <span class="mi">512</span><span class="p">],</span>
-    <span class="s1">&#39;output&#39;</span><span class="p">:</span><span class="mi">102</span><span class="p">,</span>
-    <span class="s1">&#39;dropout&#39;</span><span class="p">:</span> <span class="o">.</span><span class="mi">25</span><span class="p">,</span>
-    <span class="s1">&#39;state_dict&#39;</span><span class="p">:</span> <span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
-    <span class="s1">&#39;class_to_idx&#39;</span><span class="p">:</span> <span class="n">train_img_ds</span><span class="o">.</span><span class="n">class_to_idx</span><span class="p">,</span>
-    <span class="s1">&#39;optimizer&#39;</span><span class="p">:</span> <span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
-    <span class="s1">&#39;epochs&#39;</span><span class="p">:</span><span class="mi">8</span>
-<span class="p">}</span>
-
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">&#39;checkpoint&#39;</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">&#39;checkpoint&#39;</span><span class="p">)</span>
-<span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span> 
 </pre></div>
 
     </div>
